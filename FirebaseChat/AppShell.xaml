@@ -7,9 +7,16 @@
     xmlns:views="clr-namespace:FirebaseChat.Views"
     Shell.FlyoutBehavior="Disabled">
 
-    <ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate views:HomePage}"
-        Route="MainPage" />
+    <TabBar>
+        <ShellContent
+            Title="Home"
+            ContentTemplate="{DataTemplate views:HomePage}"
+            Route="MainPage" />
+
+        <ShellContent
+            Title="Home"
+            ContentTemplate="{DataTemplate views:SecondPage}"
+            Route="MainPage" />
+    </TabBar>
 
 </Shell>

@@ -5,4 +5,7 @@ global using FirebaseChat.Views.CustomControls;
 global using System.Collections.ObjectModel;
 global using Firebase.Database;
 global using Newtonsoft.Json;
+global using FirebaseChat.Views;
+global using System.Net.Sockets;
+
 
