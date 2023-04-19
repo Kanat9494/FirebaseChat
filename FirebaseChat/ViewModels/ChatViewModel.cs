@@ -40,8 +40,8 @@ internal class ChatViewModel : ViewModelBase
             byte[] data = Encoding.UTF8.GetBytes(jsonMessage);  
             stream.Write(data, 0, data.Length);
 
-            //Thread receiveThread = new Thread(ReceiveMessage);
-            //receiveThread.Start();
+            Thread receiveThread = new Thread(ReceiveMessage);
+            receiveThread.Start();
             //Task.Run(async () =>
             //{
             //    await ReceiveMessage();

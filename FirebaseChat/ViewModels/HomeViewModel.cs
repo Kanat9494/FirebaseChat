@@ -1,4 +1,5 @@
 ﻿using Firebase.Database.Query;
+using Microsoft.Maui.Controls;
 using System.Reactive.Linq;
 
 namespace FirebaseChat.ViewModels;
@@ -9,8 +10,8 @@ internal class HomeViewModel : ViewModelBase
     {
         Messages = new ObservableCollection<Message>();
         firebaseClient = new FirebaseClient("https://mauichat-e3ebb-default-rtdb.europe-west1.firebasedatabase.app/");
-        senderName = "996505505505";
-        receiverName = "996701555268";
+        senderName = "996701555268";
+        receiverName = "996505505505";
         SendMessage = new Command(async () =>
         {
             await OnSendMessage();
@@ -18,17 +19,36 @@ internal class HomeViewModel : ViewModelBase
 
         var collection = firebaseClient
         .Child("Messages")
+        .OrderByPriority()
+        .LimitToLast(1)
         .AsObservable<Message>()
-        .Where(m => m.Object.SenderName == receiverName && m.Object.ReceiverName == senderName)
+        .Where(m => m.Object.ReceiverName == senderName && m.Object.SenderName == receiverName)
         .Subscribe((item) =>
         {
             if (item.Object != null)
             {
                 Messages.Add(item.Object);
+
+                string lastMessageId = item.Key;
+
+                // Удаляем последнее сообщение из базы данных
+                //Task.Run(async () =>
+                //{
+                //    await firebaseClient.Child("Messages").Child(lastMessageId).DeleteAsync();
+                //});
             }
         });
 
+        //var c = firebaseClient
+        //    .Child("Messages")
+        //    .OrderByPriority()
+        //    .LimitToLast(1)
+        //    .AsObservable<Message>()
+            
+
         AbortCommand = new Command(() => collection.Dispose());
+
+        //Messages.CollectionChanged += Messages_CollectionChanged;
     }
 
     public Command SendMessage { get; }
@@ -94,5 +114,31 @@ internal class HomeViewModel : ViewModelBase
         Messages.Add(message);
 
         SendingMessage = string.Empty;
+    }
+
+    private void OnItemsUpdated()
+    {
+
+    }
+    private void Messages_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+    {
+        if (Messages.Count > 0)
+        {
+            var lastMessage = Messages.Count - 1;
+            //int count = lastMessage.Coun
+            //var lastMessage = Messages.Count(Messages.Count() - 1);
+
+            try
+            {
+                App.Current.Dispatcher.Dispatch(() =>
+                {
+                    Application.Current.MainPage.FindByName<CollectionView>("ChatCollectionView").ScrollTo(lastMessage, position: ScrollToPosition.End);
+                });
+            }
+            catch
+            {
+
+            }
+        }
     }
 }

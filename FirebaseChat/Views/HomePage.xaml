@@ -23,7 +23,9 @@
                     <CollectionView
                         ItemsSource="{Binding Messages}"
                         Grid.Row="0"
-                        VerticalOptions="FillAndExpand">
+                        VerticalOptions="FillAndExpand"
+                        x:Name="ChatCollectionView"
+                        ItemsUpdatingScrollMode="KeepLastItemInView">
                         <CollectionView.ItemTemplate>
                             <DataTemplate
                                 x:DataType="models:Message">
