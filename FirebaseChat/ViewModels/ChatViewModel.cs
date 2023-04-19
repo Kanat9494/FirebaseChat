@@ -50,13 +50,9 @@ internal class ChatViewModel : ViewModelBase
             //{
             //    ReceiveMessage();
             //})).Start();
-            SendTcpMessage(message);
+            //SendTcpMessage(message);
         }
         catch (Exception ex)
-        {
-
-        }
-        finally
         {
             Disconnect();
         }
@@ -132,40 +128,55 @@ internal class ChatViewModel : ViewModelBase
     void ReceiveMessage()
     {
         
-            while (true)
+        while (true)
+        {
+            try
             {
-                try
+                byte[] data = new byte[64];
+                StringBuilder builder = new StringBuilder();
+                int bytes = 0;
+                if (stream.CanRead)
                 {
-                    byte[] data = new byte[64];
-                    StringBuilder builder = new StringBuilder();
-                    int bytes = 0;
-                    if (stream.CanRead)
+                    do
                     {
-                        do
-                        {
-                            bytes = stream.Read(data, 0, data.Length);
-                            builder.Append(Encoding.Unicode.GetString(data, 0, bytes));
-                        }
-                        while (stream.DataAvailable && bytes > 0);
-                    }
+                        bytes = stream.Read(data, 0, data.Length);
+                        builder.Append(Encoding.Unicode.GetString(data, 0, bytes));
+                        int count = 0;
 
-                    //App.Current.Dispatcher.Dispatch(() =>
-                    //{
-                    //    SendLocalMessage(new Message2 { Content = builder.ToString() });
-                    //});
-                    if (builder.Length > 0)
-                    {
-                        App.Current.Dispatcher.Dispatch(() =>
+                        if (builder.Length > 0)
                         {
-                            SendLocalMessage(JsonConvert.DeserializeObject<Message2>(builder.ToString()));
-                        });
+                            try
+                            {
+                                App.Current.Dispatcher.Dispatch(() =>
+                                {
+                                    SendLocalMessage(new Message2
+                                    {
+                                        SenderName = receiverName,
+                                        ReceiverName = userName,
+                                        Content = builder.ToString()
+                                    });
+                                });
+                            }
+                            catch (Exception ex)
+                            {
+
+                            }
+                        }
                     }
+                    while (stream.DataAvailable && bytes > 0);
                 }
-                catch (Exception ex)
-                {
-                    Disconnect();
-                }
+
+                //App.Current.Dispatcher.Dispatch(() =>
+                //{
+                //    SendLocalMessage(new Message2 { Content = builder.ToString() });
+                //});
+                    
             }
+            catch (Exception ex)
+            {
+                Disconnect();
+            }
+        }
     }
 
     void Disconnect()

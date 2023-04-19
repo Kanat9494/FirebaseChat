@@ -46,6 +46,7 @@ internal class HomeViewModel : ViewModelBase
         //    .AsObservable<Message>()
             
 
+        
         AbortCommand = new Command(() => collection.Dispose());
 
         //Messages.CollectionChanged += Messages_CollectionChanged;
