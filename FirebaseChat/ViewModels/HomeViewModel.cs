@@ -44,10 +44,11 @@ internal class HomeViewModel : ViewModelBase
         //    .OrderByPriority()
         //    .LimitToLast(1)
         //    .AsObservable<Message>()
-            
 
-        
-        AbortCommand = new Command(() => collection.Dispose());
+
+
+        //AbortCommand = new Command(() => collection.Dispose());
+        AbortCommand = new Command(() => firebaseClient.Dispose());
 
         //Messages.CollectionChanged += Messages_CollectionChanged;
     }

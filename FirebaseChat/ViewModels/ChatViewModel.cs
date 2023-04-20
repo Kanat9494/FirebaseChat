@@ -121,7 +121,7 @@ internal class ChatViewModel : ViewModelBase
     void SendTcpMessage(Message2 message)
     {
         var jsonMessage = JsonConvert.SerializeObject(message);
-        byte[] data = Encoding.Unicode.GetBytes(jsonMessage);
+        byte[] data = Encoding.UTF8.GetBytes(jsonMessage);
         stream.Write(data, 0, data.Length);
     }
 
@@ -132,39 +132,35 @@ internal class ChatViewModel : ViewModelBase
         {
             try
             {
-                byte[] data = new byte[64];
+                byte[] data = new byte[1024];
                 StringBuilder builder = new StringBuilder();
                 int bytes = 0;
-                if (stream.CanRead)
+                do
                 {
-                    do
+                    bytes = stream.Read(data, 0, data.Length);
+                    builder.Append(Encoding.UTF8.GetString(data, 0, bytes));
+
+                    if (bytes == data.Length)
+                        Array.Resize(ref data, data.Length * 2);
+
+                    try
                     {
-                        bytes = stream.Read(data, 0, data.Length);
-                        builder.Append(Encoding.Unicode.GetString(data, 0, bytes));
-                        int count = 0;
-
-                        if (builder.Length > 0)
+                        App.Current.Dispatcher.Dispatch(() =>
                         {
-                            try
+                            SendLocalMessage(new Message2
                             {
-                                App.Current.Dispatcher.Dispatch(() =>
-                                {
-                                    SendLocalMessage(new Message2
-                                    {
-                                        SenderName = receiverName,
-                                        ReceiverName = userName,
-                                        Content = builder.ToString()
-                                    });
-                                });
-                            }
-                            catch (Exception ex)
-                            {
-
-                            }
-                        }
+                                SenderName = receiverName,
+                                ReceiverName = userName,
+                                Content = builder.ToString()
+                            });
+                        });
                     }
-                    while (stream.DataAvailable && bytes > 0);
+                    catch (Exception ex)
+                    {
+
+                    }
                 }
+                while (stream.DataAvailable);
 
                 //App.Current.Dispatcher.Dispatch(() =>
                 //{
