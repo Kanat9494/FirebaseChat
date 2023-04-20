@@ -182,7 +182,7 @@ internal class ChatViewModel : ViewModelBase
         if (client != null)
             client.Close();
 
-        Environment.Exit(0);
+        //Environment.Exit(0);
     }
     #endregion
 }
