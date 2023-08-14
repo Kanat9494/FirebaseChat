@@ -22,7 +22,7 @@ internal class HomeViewModel : ViewModelBase
         .OrderByPriority()
         .LimitToLast(1)
         .AsObservable<Message>()
-        .Where(m => m.Object.ReceiverName == senderName && m.Object.SenderName == receiverName)
+        //.Where(m => m.Object.ReceiverName == senderName && m.Object.SenderName == receiverName)
         .Subscribe((item) =>
         {
             if (item.Object != null)
@@ -83,6 +83,7 @@ internal class HomeViewModel : ViewModelBase
 
             var serializedMessage = JsonConvert.SerializeObject(message);
             await firebaseClient.Child("Messages").PostAsync(serializedMessage);
+            SendingMessage = string.Empty;
             //это лишнее убрал, чтобы не отправлять сообщение 2 раза
             //SendLocalMessage(message);
         }
